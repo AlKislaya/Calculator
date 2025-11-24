@@ -11,6 +11,8 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var displayLabel: UILabel!
     
+    private var calculator = CalculatorLogic()
+    
     private var isFinishedEditing: Bool = true
     
     private var displayValue: Double {
@@ -38,45 +40,31 @@ class ViewController: UIViewController {
     @IBAction func calcButtonPressed(_ sender: UIButton) {
         isFinishedEditing = true
         
-        if sender.titleLabel?.text == nil {
-            return
+        calculator.setNumber(displayValue)
+        
+        if let calcMethod = sender.currentTitle {
+ 
+            if let result = calculator.calculate(symbol: calcMethod) {
+                displayValue = result
+            }
         }
-        
-        let operation = sender.titleLabel!.text!
-        var output = displayValue
-        
-        switch operation {
-        case "AC":
-            output = 0
-        case "+/-":
-            output *= -1
-        case "%":
-            output /= 100
-        default:
-            print("Calculation process went wrong")
-        }
-        
-        displayValue = output
     }
 
     @IBAction func numButtonPressed(_ sender: UIButton) {
-        if sender.titleLabel?.text == nil {
+        if sender.currentTitle == nil {
             return
         }
         
-        let number = sender.titleLabel!.text!
+        let number = sender.currentTitle!
         
         if isFinishedEditing {
-            displayText = number
+            displayLabel.text = number
             isFinishedEditing = false
         } else {
-            if number == "." {
-                let currValue = displayValue
-                if currValue != floor(currValue) {
-                    return
-                }
+            if number == Constants.Calculation.Operation.point &&  floor(displayValue) != displayValue {
+                return
             }
-            displayText = displayText + number
+            displayLabel.text = displayLabel.text! + number
         }
     }
 }
